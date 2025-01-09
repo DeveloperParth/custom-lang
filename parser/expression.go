@@ -97,6 +97,12 @@ func (p *Parser) parsePrimary() ast.Expression {
 			Value: value,
 		}
 	}
+	if p.match(tokens.LEFT_PAREN) {
+		p.expect(tokens.LEFT_PAREN)
+		expr := p.parseEquality()
+		p.expect(tokens.RIGHT_PAREN)
+		return expr
+	}
 	fmt.Println(p.token)
 	panic("Invalid token")
 }
