@@ -14,18 +14,30 @@ const (
 	Illegal Type = iota // used for illegal / unknown token types
 	INT
 	IDENTIFIER
+	STRING
 
 	// operators
 	ASSIGN
 	PLUS
+	MINUS
+	SLASH
+	STAR
+	BANG_EQUAL
+	EQUAL_EQUAL
+	GREATER_THAN
+	GREATER_THAN_EQUAL
+	LESS_THAN
+	LESS_THAN_EQUAL
 
 	// symbols
 	LEFT_PAREN
 	RIGHT_PAREN
 
-	// special tokens
+	// keywords
 	PRINT
+	// special tokens
 	EOL
+	EOF
 )
 
 func (t Type) String() string {
@@ -34,20 +46,32 @@ func (t Type) String() string {
 		return "ASSIGN"
 	case PLUS:
 		return "PLUS"
+	case MINUS:
+		return "MINUS"
+	case SLASH:
+		return "SLASH"
+	case STAR:
+		return "STAR"
 	case INT:
 		return "INT"
 	case IDENTIFIER:
 		return "IDENTIFIER"
+	case STRING:
+		return "STRING"
 	case EOL:
 		return "EOL"
+	case EOF:
+		return "EOF"
 	case PRINT:
 		return "PRINT"
 	case LEFT_PAREN:
 		return "LEFT_PAREN"
 	case RIGHT_PAREN:
 		return "RIGHT_PAREN"
-	default:
+	case Illegal:
 		return "ILLEGAL"
+	default:
+		return "UNKNOWN " + string(t)
 	}
 }
 

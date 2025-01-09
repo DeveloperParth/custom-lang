@@ -2,7 +2,6 @@ package main
 
 import (
 	"os"
-	"strings"
 
 	"github.com/developerparth/my-own-lang/parser"
 )
@@ -18,10 +17,6 @@ func getFile() string {
 func main() {
 	file := getFile()
 
-	lines := strings.Split(file, "\n")
-
-	p := parser.Parser{
-		Lines: lines,
-	}
-	p.Parse()
+	p := parser.Parser{}
+	p.Parse(file)
 }

@@ -2,140 +2,71 @@ package parser
 
 import (
 	"fmt"
-	"strconv"
-	"unicode"
 
 	"github.com/developerparth/my-own-lang/ast"
 	"github.com/developerparth/my-own-lang/tokens"
 	"github.com/sanity-io/litter"
 )
 
-func appendCurrentToken(currentToken *string, tokensArray *[]tokens.Token) {
-	if *currentToken != "" {
-		if kind, exists := tokens.Keywords[*currentToken]; exists {
-			fmt.Println("Keyword: ", *currentToken)
-			token := &tokens.Token{
-				Value:     *currentToken,
-				TokenType: kind,
-			}
-			*tokensArray = append(*tokensArray, *token)
-			*currentToken = ""
-			return
-		}
-		isInt := true
-
-		for _, char := range *currentToken {
-			if !unicode.IsDigit(char) {
-				isInt = false
-				break
-			}
-		}
-		var token *tokens.Token
-		if isInt {
-			token = &tokens.Token{
-				Value:     *currentToken,
-				TokenType: tokens.INT,
-			}
-		} else {
-			token = &tokens.Token{
-				Value:     *currentToken,
-				TokenType: tokens.IDENTIFIER,
-			}
-		}
-		*tokensArray = append(*tokensArray, *token)
-	}
-	*currentToken = ""
-}
-func getTokens(line string) []tokens.Token {
-
-	tokensArray := []tokens.Token{}
-	if len(line) == 0 {
-		return tokensArray
-	}
-
-	i := 0
-	char := line[i]
-	currentToken := ""
-
-	for i < len(line) {
-		if char == ' ' {
-			appendCurrentToken(&currentToken, &tokensArray)
-		} else if char == '=' {
-			token := &tokens.Token{
-				Value:     "=",
-				TokenType: tokens.ASSIGN,
-			}
-			appendCurrentToken(&currentToken, &tokensArray)
-			tokensArray = append(tokensArray, *token)
-		} else if char == '+' {
-			token := &tokens.Token{
-				Value:     "+",
-				TokenType: tokens.PLUS,
-			}
-			appendCurrentToken(&currentToken, &tokensArray)
-			tokensArray = append(tokensArray, *token)
-		} else if char == '(' {
-			appendCurrentToken(&currentToken, &tokensArray)
-			tokensArray = append(tokensArray, tokens.NewToken(tokens.LEFT_PAREN, "("))
-		} else if char == ')' {
-			appendCurrentToken(&currentToken, &tokensArray)
-			tokensArray = append(tokensArray, tokens.NewToken(tokens.RIGHT_PAREN, ")"))
-		} else {
-			currentToken += string(char)
-		}
-
-		if i == len(line)-1 {
-			appendCurrentToken(&currentToken, &tokensArray)
-			token := &tokens.Token{
-				Value:     "",
-				TokenType: tokens.EOL,
-			}
-			tokensArray = append(tokensArray, *token)
-			break
-		}
-		i++
-		char = line[i]
-	}
-
-	return tokensArray
-
-}
-
 type Parser struct {
-	Lines  []string
+	input  string
 	token  *tokens.Token
 	tokens []tokens.Token
 	index  int
 }
 
-func (p *Parser) Parse() {
+func (p *Parser) Parse(input string) {
 	statements := make([]ast.Statement, 0)
-	for _, line := range p.Lines {
-		p.tokens = getTokens(line)
-		p.index = 0
-		p.token = &p.tokens[p.index]
-		tree := p.parse(p.token)
 
-		statements = append(statements, tree)
+	p.input = input
+	lexer := Lexer{
+		input: p.input,
+	}
+	token := lexer.next()
 
-		if tree != nil {
+	for {
+		if token.TokenType == tokens.EOF {
+			p.tokens = append(p.tokens, token)
+			break
+		}
+		p.tokens = append(p.tokens, token)
+		token = lexer.next()
+
+	}
+
+	p.token = &p.tokens[p.index]
+
+	for index, token := range p.tokens {
+		if index < p.index {
+			continue
+		}
+		if token.TokenType == tokens.EOF {
+			break
+		}
+
+		fmt.Printf("Token: %v\n", token)
+
+		statement := p.parse(&token)
+		if statement != nil {
+			statements = append(statements, statement)
 		}
 	}
+
 	root := &ast.BlockStatement{
 		Statements: statements,
 	}
 	litter.Dump(root)
 }
 
-func (p *Parser) expect(tokenType ...tokens.Type) {
+func (p *Parser) expect(tokenType ...tokens.Type) tokens.Token {
+	token := p.token
 
-	for _, t := range tokenType {
-		if p.token.TokenType == t {
-			return
-		}
+	if p.match(tokenType...) {
+		p.next()
+		return *token
 	}
 	if len(tokenType) == 1 {
-		panic("Expected " + tokenType[0].String() + " but got " + p.token.TokenType.String())
+		panic("Expected " + tokenType[0].String() + " but got " + token.TokenType.String())
 	}
 	var expected string
 	for i, t := range tokenType {
@@ -145,8 +76,7 @@ func (p *Parser) expect(tokenType ...tokens.Type) {
 			expected += " or " + t.String()
 		}
 	}
-	panic("Expected " + expected + " but got " + p.token.TokenType.String())
-
+	panic("Expected " + expected + " but got " + token.TokenType.String())
 }
 
 func (p *Parser) next() tokens.Token {
@@ -158,90 +88,20 @@ func (p *Parser) next() tokens.Token {
 
 func (p *Parser) parse(token *tokens.Token) ast.Statement {
 	switch token.TokenType {
-	case tokens.IDENTIFIER:
-		return p.parseAssignment()
-	case tokens.PRINT:
-		return p.parsePrint()
-	case tokens.EOL:
-		return nil
-	case tokens.INT:
+	case tokens.PLUS, tokens.MINUS, tokens.STAR, tokens.SLASH, tokens.INT:
+		fmt.Printf("Parsing expression: %v\n", token)
 		return p.parseExpression()
 	default:
 		fmt.Println(token.TokenType)
 		panic("Invalid token")
 	}
-
 }
 
-func (p *Parser) parseExpression() *ast.ExpressionStatement {
-	var expression ast.Expression
-	int, _ := strconv.ParseInt(p.token.Value, 10, 64)
-
-	expression = &ast.IntegerExpr{
-		Token: *p.token,
-		// cast to int64
-		Value: int,
-	}
-
-	return &ast.ExpressionStatement{
-		Expression: expression,
-	}
-}
-
-func (p *Parser) parsePrint() *ast.PrintStatement {
-	p.expect(tokens.PRINT)
-	p.next()
-	p.expect(tokens.LEFT_PAREN)
-	p.next()
-	p.expect(tokens.INT, tokens.IDENTIFIER)
-	valueToken := p.next()
-	p.expect(tokens.RIGHT_PAREN)
-	p.next()
-	p.expect(tokens.EOL)
-
-	var value ast.Node
-	if valueToken.TokenType == tokens.INT {
-		int, _ := strconv.ParseInt(valueToken.Value, 10, 64)
-
-		value = &ast.IntegerExpr{
-			Token: valueToken,
-			// cast to int64
-			Value: int,
+func (p *Parser) match(tokenType ...tokens.Type) bool {
+	for _, t := range tokenType {
+		if p.token.TokenType == t {
+			return true
 		}
-	} else if valueToken.TokenType == tokens.IDENTIFIER {
-		value = p.parse(&valueToken)
-	} else {
-		panic("Invalid value")
 	}
-
-	node := &ast.PrintStatement{
-		Token:      *p.token,
-		Expression: value,
-	}
-
-	return node
-}
-
-func (p *Parser) parseAssignment() *ast.AssignStatement {
-	p.expect(tokens.IDENTIFIER)
-	p.next()
-	p.expect(tokens.ASSIGN)
-	p.next()
-	p.expect(tokens.INT, tokens.IDENTIFIER)
-	p.next()
-	p.expect(tokens.EOL)
-
-	valueToken := p.tokens[p.index-1]
-	var value ast.Node = p.parse(&valueToken)
-
-	node := &ast.AssignStatement{
-		Token: *p.token,
-		Name: &ast.Identifier{
-			Token: *p.token,
-			Value: p.tokens[p.index-3].Value,
-		},
-		Value: value,
-	}
-
-	return node
+	return false
 }
