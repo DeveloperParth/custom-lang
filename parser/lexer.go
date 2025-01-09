@@ -66,8 +66,10 @@ func (lexer *Lexer) next() tokens.Token {
 		}
 		return tokens.NewToken(tokens.LESS_THAN, "<")
 	case '(':
+		lexer.advance()
 		return tokens.NewToken(tokens.LEFT_PAREN, "(")
 	case ')':
+		lexer.advance()
 		return tokens.NewToken(tokens.RIGHT_PAREN, ")")
 	case ';':
 		lexer.advance()
