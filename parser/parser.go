@@ -58,50 +58,32 @@ func (p *Parser) Parse(input string) {
 	litter.Dump(root)
 }
 
-func (p *Parser) expect(tokenType ...tokens.Type) tokens.Token {
-	token := p.token
-
-	if p.match(tokenType...) {
-		p.next()
-		return *token
-	}
-	if len(tokenType) == 1 {
-		panic("Expected " + tokenType[0].String() + " but got " + token.TokenType.String())
-	}
-	var expected string
-	for i, t := range tokenType {
-		if i == 0 {
-			expected += t.String()
-		} else {
-			expected += " or " + t.String()
-		}
-	}
-	panic("Expected " + expected + " but got " + token.TokenType.String())
-}
-
-func (p *Parser) next() tokens.Token {
-	token := p.tokens[p.index]
-	p.index++
-	p.token = &p.tokens[p.index]
-	return token
-}
-
 func (p *Parser) parse(token *tokens.Token) ast.Statement {
 	switch token.TokenType {
 	case tokens.PLUS, tokens.MINUS, tokens.STAR, tokens.SLASH, tokens.INT:
-		fmt.Printf("Parsing expression: %v\n", token)
-		return p.parseExpression()
+		return p.parseExpressionStatement()
+	case tokens.IDENTIFIER:
+		return p.parseAssignment()
+	case tokens.LEFT_BRACE:
+		return p.parseBlockStatement()
+	case tokens.PRINT:
+		return p.parsePrintStatement()
+	case tokens.EOL:
+		p.next()
+		return nil
+
 	default:
 		fmt.Println(token.TokenType)
 		panic("Invalid token")
 	}
 }
 
-func (p *Parser) match(tokenType ...tokens.Type) bool {
-	for _, t := range tokenType {
-		if p.token.TokenType == t {
-			return true
-		}
+func (p *Parser) parseAssignment() ast.Statement {
+	identifier := p.expect(tokens.IDENTIFIER)
+	p.expect(tokens.ASSIGN)
+	expression := p.parseExpression()
+	return &ast.AssignStatement{
+		Name:  identifier,
+		Value: expression,
 	}
-	return false
 }
