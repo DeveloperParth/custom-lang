@@ -32,6 +32,8 @@ const (
 	// symbols
 	LEFT_PAREN
 	RIGHT_PAREN
+	LEFT_BRACE
+	RIGHT_BRACE
 
 	// keywords
 	PRINT
@@ -68,6 +70,10 @@ func (t Type) String() string {
 		return "LEFT_PAREN"
 	case RIGHT_PAREN:
 		return "RIGHT_PAREN"
+	case LEFT_BRACE:
+		return "LEFT_BRACE"
+	case RIGHT_BRACE:
+		return "RIGHT_BRACE"
 	case Illegal:
 		return "ILLEGAL"
 	default:
