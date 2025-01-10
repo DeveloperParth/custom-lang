@@ -8,10 +8,14 @@ import (
 	"github.com/developerparth/my-own-lang/tokens"
 )
 
-func (p *Parser) parseExpression() *ast.ExpressionStatement {
+func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
 	return &ast.ExpressionStatement{
-		Expression: p.parseEquality(),
+		Expression: p.parseExpression(),
 	}
+}
+
+func (p *Parser) parseExpression() ast.Expression {
+	return p.parseEquality()
 }
 
 func (p *Parser) parseEquality() ast.Expression {
@@ -95,6 +99,13 @@ func (p *Parser) parsePrimary() ast.Expression {
 		return &ast.IntegerExpr{
 			Token: token,
 			Value: value,
+		}
+	}
+	if p.match(tokens.IDENTIFIER) {
+		token := p.next()
+		return &ast.IdentifierExpr{
+			Token: token,
+			Name:  token.Value,
 		}
 	}
 	if p.match(tokens.LEFT_PAREN) {
