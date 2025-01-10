@@ -71,9 +71,15 @@ func (lexer *Lexer) next() tokens.Token {
 	case ')':
 		lexer.advance()
 		return tokens.NewToken(tokens.RIGHT_PAREN, ")")
+	case '{':
+		lexer.advance()
+		return tokens.NewToken(tokens.LEFT_BRACE, "{")
+	case '}':
+		lexer.advance()
+		return tokens.NewToken(tokens.RIGHT_BRACE, "}")
 	case ';':
 		lexer.advance()
-		return lexer.next()
+		return tokens.NewToken(tokens.EOL, ";")
 	case ' ':
 		lexer.advance()
 		return lexer.next()
@@ -101,6 +107,10 @@ func (lexer *Lexer) next() tokens.Token {
 				if lexer.isEnd() {
 					break
 				}
+			}
+			keyword, ok := tokens.Keywords[value]
+			if ok {
+				return tokens.NewToken(keyword, value)
 			}
 			return tokens.NewToken(tokens.IDENTIFIER, value)
 		}
