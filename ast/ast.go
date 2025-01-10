@@ -31,11 +31,17 @@ type BinaryExpr struct {
 
 func (b *BinaryExpr) expr() {}
 
+type IdentifierExpr struct {
+	Token tokens.Token
+	Name  string
+}
+
+func (i IdentifierExpr) expr() {}
+
 // statements
 type AssignStatement struct {
-	Token tokens.Token
-	Name  *IdentifierStatement
-	Value Node
+	Name  tokens.Token
+	Value Expression
 }
 
 func (a *AssignStatement) stmt() {}
@@ -45,14 +51,6 @@ type BlockStatement struct {
 }
 
 func (b *BlockStatement) stmt() {}
-
-type IdentifierStatement struct {
-	Token tokens.Token
-	Value Expression
-	Name  string
-}
-
-func (i *IdentifierStatement) stmt() {}
 
 type PrintStatement struct {
 	Token      tokens.Token
@@ -66,6 +64,4 @@ type ExpressionStatement struct {
 }
 
 // stmt implements Statement.
-func (e ExpressionStatement) stmt() {
-	panic("unimplemented")
-}
+func (e ExpressionStatement) stmt() {}
