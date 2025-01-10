@@ -77,7 +77,7 @@ func (t Type) String() string {
 	case Illegal:
 		return "ILLEGAL"
 	default:
-		return "UNKNOWN " + string(t)
+		return "UNKNOWN " + string(rune(t))
 	}
 }
 
