@@ -37,6 +37,10 @@ const (
 
 	// keywords
 	PRINT
+	TRUE
+	FALSE
+	NULL
+
 	// special tokens
 	EOL
 	EOF
@@ -66,6 +70,12 @@ func (t Type) String() string {
 		return "EOF"
 	case PRINT:
 		return "PRINT"
+	case TRUE:
+		return "TRUE"
+	case FALSE:
+		return "FALSE"
+	case NULL:
+		return "NULL"
 	case LEFT_PAREN:
 		return "LEFT_PAREN"
 	case RIGHT_PAREN:
@@ -90,4 +100,7 @@ func NewToken(tokenType Type, value string) Token {
 
 var Keywords = map[string]Type{
 	"print": PRINT,
+	"true":  TRUE,
+	"false": FALSE,
+	"null":  NULL,
 }
