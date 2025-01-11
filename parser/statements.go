@@ -7,14 +7,14 @@ import (
 
 func (p *Parser) parseBlockStatement() ast.Statement {
 	statements := make([]ast.Statement, 0)
-	p.expect(tokens.LEFT_BRACE)
-	for !p.match(tokens.RIGHT_BRACE) {
+	p.expect(tokens.LEFT_BRACE_CURLY)
+	for !p.match(tokens.RIGHT_BRACE_CURLY) {
 		statement := p.parse(p.token)
 		if statement != nil {
 			statements = append(statements, statement)
 		}
 	}
-	p.expect(tokens.RIGHT_BRACE)
+	p.expect(tokens.RIGHT_BRACE_CURLY)
 	return &ast.BlockStatement{
 		Statements: statements,
 	}

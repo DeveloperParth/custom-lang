@@ -65,7 +65,7 @@ func (p *Parser) parse(token *tokens.Token) ast.Statement {
 		return p.parseExpressionStatement()
 	case tokens.IDENTIFIER:
 		return p.parseAssignment()
-	case tokens.LEFT_BRACE:
+	case tokens.LEFT_BRACE_CURLY:
 		return p.parseBlockStatement()
 	case tokens.PRINT:
 		return p.parsePrintStatement()

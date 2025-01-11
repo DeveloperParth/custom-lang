@@ -77,10 +77,10 @@ func (lexer *Lexer) next() tokens.Token {
 		return tokens.NewToken(tokens.RIGHT_PAREN, ")")
 	case '{':
 		lexer.advance()
-		return tokens.NewToken(tokens.LEFT_BRACE, "{")
+		return tokens.NewToken(tokens.LEFT_BRACE_CURLY, "{")
 	case '}':
 		lexer.advance()
-		return tokens.NewToken(tokens.RIGHT_BRACE, "}")
+		return tokens.NewToken(tokens.RIGHT_BRACE_CURLY, "}")
 	case ';':
 		lexer.advance()
 		return tokens.NewToken(tokens.EOL, ";")
