@@ -34,6 +34,8 @@ func (v *Variable) get() any {
 		return v.Literal.value.(bool)
 	case NULL:
 		return nil
+	case STRING:
+		return v.Literal.value.(string)
 	}
 	return nil
 }
