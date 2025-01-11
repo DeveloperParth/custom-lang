@@ -38,6 +38,13 @@ type IdentifierExpr struct {
 
 func (i IdentifierExpr) expr() {}
 
+type BooleanExpr struct {
+	Token tokens.Token
+	Value bool
+}
+
+func (b BooleanExpr) expr() {}
+
 // statements
 type AssignStatement struct {
 	Name  tokens.Token
@@ -54,7 +61,7 @@ func (b *BlockStatement) stmt() {}
 
 type PrintStatement struct {
 	Token      tokens.Token
-	Expression Node
+	Expression Expression
 }
 
 func (p *PrintStatement) stmt() {}
