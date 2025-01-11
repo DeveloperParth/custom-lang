@@ -87,6 +87,9 @@ func (lexer *Lexer) next() tokens.Token {
 	case ' ':
 		lexer.advance()
 		return lexer.next()
+	case '"':
+		val := lexer.readString()
+		return tokens.NewToken(tokens.STRING, val)
 	case '\n':
 		lexer.advance()
 		return tokens.NewToken(tokens.EOL, "\n")
@@ -132,6 +135,16 @@ func (lexer *Lexer) peek() byte {
 	return lexer.input[lexer.position+1]
 }
 
+func (lexer *Lexer) readString() string {
+	lexer.advance()
+	var value string
+	for lexer.current() != '"' {
+		value += string(lexer.current())
+		lexer.advance()
+	}
+	lexer.advance()
+	return value
+}
 func (lexer *Lexer) advance() byte {
 	char := lexer.current()
 	if !lexer.isEnd() {
