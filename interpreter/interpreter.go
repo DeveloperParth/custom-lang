@@ -68,24 +68,43 @@ func interpretExpression(expression ast.Expression, env *Environment) Literal {
 	case *ast.IntegerExpr:
 		return NewLiteral(INT, expression.Value)
 	case *ast.BinaryExpr:
-		leftLit := interpretExpression(expression.Left, env)
-		rightLit := interpretExpression(expression.Right, env)
+		return interpretBinaryExpr(expression, env)
 
-		if leftLit.datatype != INT || rightLit.datatype != INT {
-			message := fmt.Sprintf("Unsupported operation between %v and %v", leftLit.datatype, rightLit.datatype)
-			panic(message)
+	case *ast.IdentifierExpr:
+		variable := env.getOrPanic(expression.Name)
+		return variable.Literal
+	case *ast.BooleanExpr:
+		return NewLiteral(BOOL, expression.Value)
+	case *ast.StringExpr:
+		return NewLiteral(STRING, expression.Value)
+	default:
+		panic("Unknown expression")
+	}
+}
+
+func interpretBinaryExpr(expression *ast.BinaryExpr, env *Environment) Literal {
+	leftLit := interpretExpression(expression.Left, env)
+	rightLit := interpretExpression(expression.Right, env)
+
+	arethmeticOperators := []tokens.Type{
+		tokens.PLUS,
+		tokens.MINUS,
+		tokens.STAR,
+		tokens.SLASH,
+	}
+	for _, operator := range arethmeticOperators {
+		if expression.Operator.TokenType == operator {
+			return interpretArithmeticBinaryExpr(expression, leftLit, rightLit)
 		}
+	}
+	if leftLit.datatype != rightLit.datatype {
+		message := fmt.Sprintf("Unsupported %v operation between %v and %v", expression.Operator.TokenType.String(), leftLit.datatype, rightLit.datatype)
+		panic(message)
+	}
+	if leftLit.datatype == INT {
 		left := leftLit.value.(int64)
 		right := rightLit.value.(int64)
 		switch expression.Operator.TokenType {
-		case tokens.PLUS:
-			return NewLiteral(INT, left+right)
-		case tokens.MINUS:
-			return NewLiteral(INT, left-right)
-		case tokens.STAR:
-			return NewLiteral(INT, left*right)
-		case tokens.SLASH:
-			return NewLiteral(INT, left/right)
 		case tokens.GREATER_THAN:
 			return NewLiteral(BOOL, left > right)
 		case tokens.GREATER_THAN_EQUAL:
@@ -101,13 +120,39 @@ func interpretExpression(expression ast.Expression, env *Environment) Literal {
 		default:
 			panic("Unknown operator")
 		}
+	} else if leftLit.datatype == BOOL {
+		left := leftLit.value.(bool)
+		right := rightLit.value.(bool)
+		switch expression.Operator.TokenType {
+		case tokens.EQUAL_EQUAL:
+			return NewLiteral(BOOL, left == right)
+		case tokens.BANG_EQUAL:
+			return NewLiteral(BOOL, left != right)
+		default:
+			panic("Unknown operator")
+		}
+	} else {
+		panic("Unknown datatype")
+	}
+}
 
-	case *ast.IdentifierExpr:
-		variable := env.getOrPanic(expression.Name)
-		return variable.Literal
-	case *ast.BooleanExpr:
-		return NewLiteral(BOOL, expression.Value)
+func interpretArithmeticBinaryExpr(expression *ast.BinaryExpr, leftLit, rightLit Literal) Literal {
+	if leftLit.datatype != INT || rightLit.datatype != INT {
+		message := fmt.Sprintf("Unsupported operation between %v and %v", leftLit.datatype, rightLit.datatype)
+		panic(message)
+	}
+	left := leftLit.value.(int64)
+	right := rightLit.value.(int64)
+	switch expression.Operator.TokenType {
+	case tokens.PLUS:
+		return NewLiteral(INT, left+right)
+	case tokens.MINUS:
+		return NewLiteral(INT, left-right)
+	case tokens.STAR:
+		return NewLiteral(INT, left*right)
+	case tokens.SLASH:
+		return NewLiteral(INT, left/right)
 	default:
-		panic("Unknown expression")
+		panic("Unknown operator")
 	}
 }
