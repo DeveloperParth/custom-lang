@@ -15,7 +15,7 @@ type Parser struct {
 	index  int
 }
 
-func (p *Parser) Parse(input string) {
+func (p *Parser) Parse(input string) *ast.BlockStatement {
 	statements := make([]ast.Statement, 0)
 
 	p.input = input
@@ -56,6 +56,7 @@ func (p *Parser) Parse(input string) {
 		Statements: statements,
 	}
 	litter.Dump(root)
+	return root
 }
 
 func (p *Parser) parse(token *tokens.Token) ast.Statement {
@@ -68,6 +69,8 @@ func (p *Parser) parse(token *tokens.Token) ast.Statement {
 		return p.parseBlockStatement()
 	case tokens.PRINT:
 		return p.parsePrintStatement()
+	case tokens.TRUE, tokens.FALSE:
+		return p.parseExpressionStatement()
 	case tokens.EOL:
 		p.next()
 		return nil
