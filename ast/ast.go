@@ -45,6 +45,13 @@ type BooleanExpr struct {
 
 func (b BooleanExpr) expr() {}
 
+type StringExpr struct {
+	Token tokens.Token
+	Value string
+}
+
+func (s StringExpr) expr() {}
+
 // statements
 type AssignStatement struct {
 	Name  tokens.Token
