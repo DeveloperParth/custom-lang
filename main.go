@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 
+	"github.com/developerparth/my-own-lang/interpreter"
 	"github.com/developerparth/my-own-lang/parser"
 )
 
@@ -18,5 +19,6 @@ func main() {
 	file := getFile()
 
 	p := parser.Parser{}
-	p.Parse(file)
+	root := p.Parse(file)
+	interpreter.Interpret(root.Statements)
 }
