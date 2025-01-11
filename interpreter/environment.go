@@ -3,9 +3,10 @@ package interpreter
 type Datatype string
 
 const (
-	INT  Datatype = "int"
-	BOOL Datatype = "bool"
-	NULL Datatype = "null"
+	INT    Datatype = "int"
+	BOOL   Datatype = "bool"
+	NULL   Datatype = "null"
+	STRING Datatype = "string"
 )
 
 type Literal struct {
