@@ -114,6 +114,14 @@ func (p *Parser) parsePrimary() ast.Expression {
 		p.expect(tokens.RIGHT_PAREN)
 		return expr
 	}
+	if p.match(tokens.TRUE, tokens.FALSE) {
+		token := p.next()
+		value := token.TokenType == tokens.TRUE
+		return &ast.BooleanExpr{
+			Token: token,
+			Value: value,
+		}
+	}
 	fmt.Println(p.token)
 	panic("Invalid token")
 }
