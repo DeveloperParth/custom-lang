@@ -43,10 +43,14 @@ func (lexer *Lexer) next() tokens.Token {
 		return tokens.NewToken(tokens.SLASH, "/")
 	case '=':
 		lexer.advance()
-		return tokens.NewToken(tokens.ASSIGN, "=")
-	case '!':
 		if lexer.current() == '=' {
 			lexer.advance()
+			return tokens.NewToken(tokens.EQUAL_EQUAL, "==")
+		}
+		return tokens.NewToken(tokens.ASSIGN, "=")
+	case '!':
+		lexer.advance()
+		if lexer.current() == '=' {
 			lexer.advance()
 			return tokens.NewToken(tokens.BANG_EQUAL, "!=")
 		}
