@@ -70,5 +70,12 @@ type ExpressionStatement struct {
 	Expression Expression
 }
 
-// stmt implements Statement.
 func (e ExpressionStatement) stmt() {}
+
+type IfStatement struct {
+	Condition Expression
+	Then      Statement
+	Else      Statement
+}
+
+func (i IfStatement) stmt() {}
