@@ -28,3 +28,24 @@ func (p *Parser) parsePrintStatement() ast.Statement {
 		Expression: expression,
 	}
 }
+
+func (p *Parser) parseIfStatement() ast.Statement {
+	p.expect(tokens.IF)
+	condition := p.parseExpression()
+	block := p.parseBlockStatement()
+	var elseBlock ast.Statement
+	if p.match(tokens.ELSE) {
+		p.expect(tokens.ELSE)
+		if p.match(tokens.IF) {
+			elseBlock = p.parseIfStatement()
+		} else {
+			elseBlock = p.parseBlockStatement()
+		}
+	}
+
+	return &ast.IfStatement{
+		Condition: condition,
+		Then:      block,
+		Else:      elseBlock,
+	}
+}
