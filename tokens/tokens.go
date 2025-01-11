@@ -40,6 +40,8 @@ const (
 	TRUE
 	FALSE
 	NULL
+	IF
+	ELSE
 
 	// special tokens
 	EOL
@@ -76,6 +78,22 @@ func (t Type) String() string {
 		return "FALSE"
 	case NULL:
 		return "NULL"
+	case IF:
+		return "IF"
+	case ELSE:
+		return "ELSE"
+	case BANG_EQUAL:
+		return "BANG_EQUAL"
+	case EQUAL_EQUAL:
+		return "EQUAL_EQUAL"
+	case GREATER_THAN:
+		return "GREATER_THAN"
+	case GREATER_THAN_EQUAL:
+		return "GREATER_THAN_EQUAL"
+	case LESS_THAN:
+		return "LESS_THAN"
+	case LESS_THAN_EQUAL:
+		return "LESS_THAN_EQUAL"
 	case LEFT_PAREN:
 		return "LEFT_PAREN"
 	case RIGHT_PAREN:
@@ -103,4 +121,6 @@ var Keywords = map[string]Type{
 	"true":  TRUE,
 	"false": FALSE,
 	"null":  NULL,
+	"if":    IF,
+	"else":  ELSE,
 }
