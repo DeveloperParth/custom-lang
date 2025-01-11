@@ -71,6 +71,8 @@ func (p *Parser) parse(token *tokens.Token) ast.Statement {
 		return p.parsePrintStatement()
 	case tokens.TRUE, tokens.FALSE:
 		return p.parseExpressionStatement()
+	case tokens.IF:
+		return p.parseIfStatement()
 	case tokens.EOL:
 		p.next()
 		return nil
