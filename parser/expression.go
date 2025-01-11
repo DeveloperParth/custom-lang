@@ -122,6 +122,13 @@ func (p *Parser) parsePrimary() ast.Expression {
 			Value: value,
 		}
 	}
-	fmt.Println(p.token)
-	panic("Invalid token")
+	if p.match(tokens.STRING) {
+		token := p.next()
+		return &ast.StringExpr{
+			Token: token,
+			Value: token.Value,
+		}
+	}
+	message := fmt.Sprintf("Unexpected token %v", p.token.TokenType.String())
+	panic(message)
 }
