@@ -50,8 +50,8 @@ func interpret(statement ast.Statement, env *Environment) {
 		}
 
 	default:
-		println(statement)
-		panic("Unknown statement")
+		message := fmt.Sprintf("Unknown statement: %v", statement)
+		panic(message)
 	}
 
 }
