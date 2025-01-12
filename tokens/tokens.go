@@ -42,6 +42,7 @@ const (
 	NULL
 	IF
 	ELSE
+	FUNC
 
 	// special tokens
 	EOL
@@ -82,6 +83,8 @@ func (t Type) String() string {
 		return "IF"
 	case ELSE:
 		return "ELSE"
+	case FUNC:
+		return "FUNC"
 	case BANG_EQUAL:
 		return "BANG_EQUAL"
 	case EQUAL_EQUAL:
@@ -123,4 +126,5 @@ var Keywords = map[string]Type{
 	"null":  NULL,
 	"if":    IF,
 	"else":  ELSE,
+	"func":  FUNC,
 }
