@@ -1,5 +1,7 @@
 package interpreter
 
+import "github.com/developerparth/my-own-lang/ast"
+
 type Datatype string
 
 const (
@@ -41,8 +43,14 @@ func (v *Variable) get() any {
 }
 
 type Environment struct {
-	parent *Environment
-	vars   map[string]Variable
+	parent    *Environment
+	vars      map[string]Variable
+	functions map[string]Function
+}
+
+type Function struct {
+	env   *Environment
+	block *ast.BlockStatement
 }
 
 func (e *Environment) getOrPanic(name string) Variable {
@@ -72,9 +80,32 @@ func (e *Environment) set(name string, value Literal) {
 	}
 }
 
+func (e *Environment) getFunction(name string) (Function, bool) {
+	value, ok := e.functions[name]
+	if !ok {
+		if e.parent != nil {
+			return e.parent.getFunction(name)
+		} else {
+			return Function{}, false
+		}
+	}
+	return value, true
+}
+
+func (e *Environment) setFunction(name string, block *ast.BlockStatement) {
+	if _, ok := e.getFunction(name); ok {
+		panic("Function already exists")
+	}
+	e.functions[name] = Function{
+		env:   NewEnvironment(e),
+		block: block,
+	}
+}
+
 func NewEnvironment(parent *Environment) *Environment {
 	return &Environment{
-		vars:   make(map[string]Variable),
-		parent: parent,
+		vars:      make(map[string]Variable),
+		functions: make(map[string]Function),
+		parent:    parent,
 	}
 }
