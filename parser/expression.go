@@ -129,6 +129,23 @@ func (p *Parser) parsePrimary() ast.Expression {
 			Value: token.Value,
 		}
 	}
+	if p.match(tokens.LEFT_BRACE) {
+		p.expect(tokens.LEFT_BRACE)
+
+		arrayOfElements := make([]ast.Expression, 0)
+
+		for p.token.TokenType != tokens.RIGHT_BRACE {
+			arrayOfElements = append(arrayOfElements, p.parseExpression())
+			println(p.token.TokenType.String())
+			if p.token.TokenType != tokens.RIGHT_BRACE {
+				p.expect(tokens.COMMA)
+			}
+		}
+		p.expect(tokens.RIGHT_BRACE)
+		return &ast.ArrayExpr{
+			Elements: arrayOfElements,
+		}
+	}
 	message := fmt.Sprintf("Unexpected token %v", p.token.TokenType.String())
 	panic(message)
 }
