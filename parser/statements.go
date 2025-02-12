@@ -49,3 +49,36 @@ func (p *Parser) parseIfStatement() ast.Statement {
 		Else:      elseBlock,
 	}
 }
+
+func (p *Parser) parseFuncDeclaration() ast.Statement {
+	params := make([]ast.FunctionParameters, 0)
+	p.expect(tokens.FUNC)
+	identifier := p.expect(tokens.IDENTIFIER)
+	p.expect(tokens.LEFT_PAREN)
+	// todo: handle params
+	for !p.match(tokens.RIGHT_PAREN) {
+		// varaible name
+		ident := p.expect(tokens.IDENTIFIER)
+		// type
+		datatype := parse_type(p)
+		if !p.match(tokens.RIGHT_PAREN) {
+			p.expect(tokens.COMMA)
+		}
+		params = append(params, ast.FunctionParameters{
+			Datatype: datatype,
+			Name:     ident.Value,
+			Token:    ident,
+		})
+	}
+	p.expect(tokens.RIGHT_PAREN)
+	block := p.parseBlockStatement()
+	blockStatements, ok := block.(*ast.BlockStatement)
+	if !ok {
+		panic("Invalid block statement")
+	}
+	return &ast.FuncDeclarationStatement{
+		Identifier: identifier,
+		Block:      *blockStatements,
+		Params:     params,
+	}
+}

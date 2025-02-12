@@ -44,8 +44,6 @@ func (p *Parser) Parse(input string) *ast.BlockStatement {
 			break
 		}
 
-		fmt.Printf("Token: %v\n", token)
-
 		statement := p.parse(&token)
 		if statement != nil {
 			statements = append(statements, statement)
@@ -69,6 +67,8 @@ func (p *Parser) parse(token *tokens.Token) ast.Statement {
 		return p.parseBlockStatement()
 	case tokens.PRINT:
 		return p.parsePrintStatement()
+	case tokens.FUNC:
+		return p.parseFuncDeclaration()
 	case tokens.TRUE, tokens.FALSE:
 		return p.parseExpressionStatement()
 	case tokens.IF:
@@ -85,10 +85,22 @@ func (p *Parser) parse(token *tokens.Token) ast.Statement {
 
 func (p *Parser) parseAssignment() ast.Statement {
 	identifier := p.expect(tokens.IDENTIFIER)
-	p.expect(tokens.ASSIGN)
-	expression := p.parseExpression()
-	return &ast.AssignStatement{
-		Name:  identifier,
-		Value: expression,
+	if p.token.TokenType == tokens.ASSIGN {
+		p.expect(tokens.ASSIGN)
+		expression := p.parseExpression()
+		return &ast.AssignStatement{
+			Name:  identifier,
+			Value: expression,
+		}
 	}
+	if p.token.TokenType == tokens.LEFT_PAREN {
+		p.expect(tokens.LEFT_PAREN)
+		// todo : handle params
+		p.expect(tokens.RIGHT_PAREN)
+		return &ast.FuncCallStatement{
+			Identifier: identifier,
+		}
+	}
+	message := fmt.Sprintf("Expected ASSIGN or LEFT_PAREN but got %v", p.token.TokenType.String())
+	panic(message)
 }
