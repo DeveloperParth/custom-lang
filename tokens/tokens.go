@@ -34,6 +34,9 @@ const (
 	RIGHT_PAREN
 	LEFT_BRACE_CURLY
 	RIGHT_BRACE_CURLY
+	LEFT_BRACE
+	RIGHT_BRACE
+	COMMA
 
 	// keywords
 	PRINT
@@ -101,10 +104,16 @@ func (t Type) String() string {
 		return "LEFT_PAREN"
 	case RIGHT_PAREN:
 		return "RIGHT_PAREN"
-	case LEFT_BRACE_CURLY:
+	case LEFT_BRACE:
 		return "LEFT_BRACE"
-	case RIGHT_BRACE_CURLY:
+	case RIGHT_BRACE:
 		return "RIGHT_BRACE"
+	case LEFT_BRACE_CURLY:
+		return "LEFT_BRACE_CURLY"
+	case RIGHT_BRACE_CURLY:
+		return "RIGHT_BRACE_CURLY"
+	case COMMA:
+		return "COMMA"
 	case Illegal:
 		return "ILLEGAL"
 	default:
