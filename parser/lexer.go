@@ -81,6 +81,15 @@ func (lexer *Lexer) next() tokens.Token {
 	case '}':
 		lexer.advance()
 		return tokens.NewToken(tokens.RIGHT_BRACE_CURLY, "}")
+	case '[':
+		lexer.advance()
+		return tokens.NewToken(tokens.LEFT_BRACE, "[")
+	case ']':
+		lexer.advance()
+		return tokens.NewToken(tokens.RIGHT_BRACE, "]")
+	case ',':
+		lexer.advance()
+		return tokens.NewToken(tokens.COMMA, ",")
 	case ';':
 		lexer.advance()
 		return tokens.NewToken(tokens.EOL, ";")
