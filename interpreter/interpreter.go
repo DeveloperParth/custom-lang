@@ -48,6 +48,21 @@ func interpret(statement ast.Statement, env *Environment) {
 		} else {
 			env.set(statement.Name.Value, value)
 		}
+	case *ast.FuncDeclarationStatement:
+		_, exists := env.getFunction(statement.Identifier.Value)
+		if exists {
+			message := fmt.Sprintf("Function with identifier %v is already declered", statement.Identifier.Value)
+			panic(message)
+		} else {
+			env.setFunction(statement.Identifier.Value, &statement.Block)
+		}
+	case *ast.FuncCallStatement:
+		function, exists := env.getFunction(statement.Identifier.Value)
+		if !exists {
+			message := fmt.Sprintf("Ca not find Function %v", statement.Identifier.Value)
+			panic(message)
+		}
+		interpret(function.block, function.env)
 
 	default:
 		message := fmt.Sprintf("Unknown statement: %v", statement)
